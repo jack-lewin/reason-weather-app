@@ -3,7 +3,7 @@ type state = {
 };
 
 type action =
-| LoadedWeather(WeatherData.weather);
+  | LoadedWeather(WeatherData.weather);
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -21,10 +21,10 @@ let make = (_children) => {
 
   reducer: (action, _prevState) => {
     switch action {
-      | LoadedWeather(newWeather) =>
-        ReasonReact.Update({
-          weather: newWeather
-        })
+    | LoadedWeather(newWeather) =>
+      ReasonReact.Update({
+        weather: newWeather
+      })
     }
   },
 
