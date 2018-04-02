@@ -1,5 +1,5 @@
 type state = {
-  weather: WeatherData.weather
+  weather: option(WeatherData.weather)
 };
 
 type action =
@@ -7,29 +7,48 @@ type action =
 
 let component = ReasonReact.reducerComponent("App");
 
-let dummyWeather: WeatherData.weather = {
-  summary: "Warm throughout the day",
-  temp: 30.5
-};
-
 let make = (_children) => {
   ...component,
 
   initialState: () => {
-    weather: dummyWeather
+    weather: None
+  },
+
+  didMount: (self) => {
+    let handleWeatherLoaded = weather => self.send(LoadedWeather(weather));
+
+    WeatherData.getWeather()
+      |> Js.Promise.then_(
+        weather => {
+          handleWeatherLoaded(weather);
+          Js.Promise.resolve();
+        }
+      )
+      |> ignore;
+
+    ReasonReact.NoUpdate;
   },
 
   reducer: (action, _prevState) => {
     switch action {
     | LoadedWeather(newWeather) =>
       ReasonReact.Update({
-        weather: newWeather
+        weather: Some(newWeather)
       })
     }
   },
 
   render: (self) =>
     <div className="App">
-      <p> (ReasonReact.stringToElement(self.state.weather.summary)) </p>
+      <p>
+      {
+        switch self.state.weather {
+        | None =>
+            ReasonReact.stringToElement("Loading weather...");
+        | Some(weather) =>
+            ReasonReact.stringToElement(weather.summary);
+        }
+      }
+      </p>
     </div>
 };
