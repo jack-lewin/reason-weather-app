@@ -8,7 +8,7 @@ let url = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%2
 let parseWeatherJson = json =>
   Json.Decode.{
     summary: field("text", string, json),
-    temp: field("temp", Json.Decode.float, json)
+    temp: float_of_string(field("temp", string, json))
   };
 
 let parseWeatherResultsJson = json =>
